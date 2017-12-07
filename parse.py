@@ -26,10 +26,11 @@ missing = 0
 
 def main():
 	userX = []
-
+	idindex = 0
 	for user in Users:
+		idindex += 1
 		#print json.dumps(user)
-		weibox = getWeibo(_start_time,_end_time, Users[user]['weibo'],user)
+		(weibox,weibol) = getWeibo(_start_time,_end_time, Users[user]['weibo'],user)
 		if weibox != {}:
 			try :
 				assert Users[user]['followers_count'][_uend_time] != 0
@@ -58,11 +59,35 @@ def main():
 			userinfo['percentlike'] = float (userinfo['likes']) / userinfo['startlikes'] * 100
 			userinfo['percentco'] = float (userinfo['comment']) / userinfo['startcomment'] * 100
 			userinfo['bi_follow'] = Users[user]['bi_followers_count']
-			userX.append(userinfo)
+			userinfo['idindex'] = idindex
+			keylist = Users[user]['followers_count'].keys()
+			keylist.sort()
+			prev = ''
+			diffl = []
+			for key in keylist:
+				if prev != '':
+					difffo = Users[user]['followers_count'][key] - Users[user]['followers_count'][prev]
+					diffl.append(difffo)
+				prev = key 
+			i = 0
+			try:
+				assert len(diffl) == len(weibol)
+				for weibo in weibol: 
+					weibo['difffo'] = diffl[i]
+					weibo['timerank'] = i + 1
+					i += 1
+					weibo.update(userinfo)
+				userX = userX + weibol
+			except:
+				print user
+			
 
-	for user in userX:
-		print json.dumps(user, indent=4)
-	f = open("Tabledata.json", "w+")
+			
+
+
+	#for user in userX:
+		#print json.dumps(user, indent=4)
+	f = open("Paneldata.json", "w+")
 	f.write (json.dumps(userX, indent = 4))
 	print len(userX)
 
@@ -81,11 +106,22 @@ def getWeibo(starttime, endtime, weibo, uid):
 		lenindex += weibo[weiboid][0]['text']
 	endpost = {}
 	startpost = {}
+	prevweibo = {}
+	weiboxl = []
 	for records in sweibo:
 		if records['timestamp'] == starttime:
 			startpost = records
 		if records['timestamp'] == endtime:
 			endpost = records
+		if prevweibo != {}:
+			singleweibo = {
+				'diffrepo' : records['reposts_count'] - prevweibo['reposts_count'],
+				'diffco' : records['comments_count'] - prevweibo['comments_count'],
+				'difflike' : records['attitudes_count'] - prevweibo['attitudes_count'],
+				'timestamp' : records['timestamp']
+			}
+			weiboxl.append(singleweibo)
+		prevweibo = records
 	weibox = {}
 	if endpost !={} and startpost != {}:
 		weibox = {
@@ -100,10 +136,13 @@ def getWeibo(starttime, endtime, weibo, uid):
 			'time' : startpost['time'],
 			'uid' : uid
 		}
+	"""for singleweibo in weiboxl:
+		singleweibo.update(weibox)
+		print json.dumps(singleweibo, indent = 4)"""
 	"""if weibox == {}:
 		print "1 missing"
 	weibox['uid'] = uid"""
-	return weibox
+	return (weibox, weiboxl) 
 
 """def getaverage():
 	for user in Users:"""
