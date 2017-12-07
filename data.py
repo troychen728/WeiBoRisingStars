@@ -18,9 +18,9 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
-#_access_token = "2.00WEUbgG0ftSid4e7cdf92bfNwscEE"
+_access_token = "2.00WEUbgG0ftSid4e7cdf92bfNwscEE"
 #CMU _access_token = "2.00xusAWD0YuxsZ10f9689fa7sIoHJC"
-_access_token = "2.00wlJ6AH1EXzAD76d30bb3252rJlVE" #CKL
+#_access_token = "2.00wlJ6AH1EXzAD76d30bb3252rJlVE" #CKL
 _statuese_url = "https://api.weibo.com/2/statuses/home_timeline.json"
 _weibo_url = "https://api.weibo.com/2/statuses/show.json"
 Users = {}
@@ -110,6 +110,7 @@ def getstatuese(timeS):
 		ids = ids + ',' + str(idlist[i])
 	
 	#print ids
+	print len(Users)
 
 	# add a new dict class here
 	# just keep the info we want 
