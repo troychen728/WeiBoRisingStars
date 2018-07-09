@@ -19,6 +19,8 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 _access_token = "2.00WEUbgG0ftSid4e7cdf92bfNwscEE"
+#CMU _access_token = "2.00xusAWD0YuxsZ10f9689fa7sIoHJC"
+#_access_token = "2.00wlJ6AH1EXzAD76d30bb3252rJlVE" #CKL
 _statuese_url = "https://api.weibo.com/2/statuses/home_timeline.json"
 _weibo_url = "https://api.weibo.com/2/statuses/show.json"
 Users = {}
@@ -50,8 +52,11 @@ def getstatuese(timeS):
 	ids = f.read()
 
 	rf = requests.get(("https://api.weibo.com/2/users/counts.json?access_token=%s&uids=" %_access_token) + ids)
-	df = [json.loads(line) for line in r.iter_lines()]
+	df = [json.loads(line) for line in rf.iter_lines()]
 	datafo = df[0]
+
+	
+	#print json.dumps(datafo, indent =4 )
 
 	#print json.dumps(data)
 	f = open('Statuess%s.json' %timeS,'w+')
@@ -60,13 +65,16 @@ def getstatuese(timeS):
 		uid = dic['user']['id']
 		weiboid = dic['id']
 		cunUser = dic['user']
+		statuses_count = 0
+		friends_count = 0
+		followers_count = 0
 		for user in datafo:
 			if user['id'] == uid:
 				statuses_count = user['statuses_count']
 				friends_count = user['friends_count']
 				followers_count = user['followers_count']
 
-		#idlist.append(dic['user']['id'])
+		idlist.append(dic['user']['id'])
 		if str(uid) not in Users:
 			logger.info("Initialize user id %d" % uid)
 			Users[str(uid)] = {
@@ -97,18 +105,19 @@ def getstatuese(timeS):
 		#print (dic['user']['id'])
 
 	#print Users
-	"""ids = str(idlist[0])
+	ids = str(idlist[0])
 	for i in range(1,len(idlist)):
 		ids = ids + ',' + str(idlist[i])
 	
-	print ids"""
+	#print ids
+	print len(Users)
 
 	# add a new dict class here
 	# just keep the info we want 
 	f.write(json.dumps(Users, indent = 4))
 	f.write('\n')
-	#f = open('ids.txt','w+')
-	#f.write(ids)
+	f = open('ids.txt','w+')
+	f.write(ids)
 
 def getWeibobyid(id, data):
 	ts = time.time()
@@ -149,7 +158,7 @@ def main():
 		while True:
 			#getdata(ids, st)
 			getstatuese(st)
-			time.sleep(10)
+			time.sleep(600)
 
 	except KeyboardInterrupt:
 		pass
